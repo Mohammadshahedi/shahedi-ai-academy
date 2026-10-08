@@ -14,6 +14,8 @@
 - `children-education.md`: آموزش کودک و نوجوان
 - `human-resources.md`: جذب، ارزیابی و مدیریت عملکرد نیروها
 - `learning-space.md`: چیدمان و تجهیز فضای آموزشی
+- `ethical-behavioral-business.md`: علوم رفتاری، اقناع اخلاقی و ماندگاری برند
+- `business-launch-2027.md`: راه‌اندازی کسب‌وکار و شیوه‌های به‌روز ۲۰۲۶–۲۰۲۷
 - `shared-context.md`: قواعد ثابت و مشترک همه Agentها
 
 ## روش استفاده

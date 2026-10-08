@@ -1,0 +1,31 @@
+# کنترل خودکار نسخه استاتیک در Pull Request و Push شاخه اصلی
+name: Validate static site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      # مخزن با حداقل دسترسی لازم دریافت می‌شود.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # نسخه پایدار Node برای اجرای اسکریپت‌های بدون وابستگی پروژه کافی است.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate site structure
+        run: node scripts/validate-site.mjs
+
+      - name: Check shared JavaScript syntax
+        run: node --check dist/assets/site.js
