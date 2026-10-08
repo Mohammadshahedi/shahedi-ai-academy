@@ -27,5 +27,13 @@ jobs:
       - name: Validate site structure
         run: node scripts/validate-site.mjs
 
+      # مرزهای پیش‌نمایش فاز ۳A، RBAC و رضایت والدین مستقل کنترل می‌شوند.
+      - name: Validate phase 3A safety contracts
+        run: node scripts/validate-phase3.mjs
+
       - name: Check shared JavaScript syntax
         run: node --check dist/assets/site.js
+
+      # خود اعتبارسنج فاز ۳ نیز باید از نظر نحو JavaScript سالم بماند.
+      - name: Check phase 3 validator syntax
+        run: node --check scripts/validate-phase3.mjs

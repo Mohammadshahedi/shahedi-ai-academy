@@ -1,0 +1,489 @@
+# قرارداد پیشنهادی API حساب‌ها؛ این فایل در فاز ۳A فقط سند طراحی است.
+openapi: 3.1.0
+info:
+  title: Shahedi Academy Accounts API
+  version: 0.3.0-draft
+  description: >-
+    قرارداد provider-neutral برای حساب‌ها، نقش‌ها و مسیر والد‌محور.
+    هیچ مسیر این سند در نسخه استاتیک فاز ۳A پیاده‌سازی یا منتشر نشده است.
+x-phase-status: design-only
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+
+# نشانی محیط عمداً تعیین نشده تا میزبانی پیش از تصویب قفل نشود.
+tags:
+  - name: Auth
+    description: مرز انتزاعی آغاز و پایان نشست؛ پیاده‌ساز هویت در ۳B انتخاب می‌شود.
+  - name: Account
+    description: اطلاعات حساب جاری با حداقل داده لازم.
+  - name: Guardian
+    description: پرونده و گزارش زیر ۱۸ سال فقط از مسیر والد یا سرپرست.
+  - name: Instructor
+    description: دسترسی محدود به کلاس‌های تخصیص‌یافته.
+  - name: Administration
+    description: عملیات مدیریتی ریزدانه و قابل حسابرسی.
+
+paths:
+  /v1/accounts:
+    post:
+      tags: [Account]
+      summary: درخواست ایجاد حساب دانشجوی بزرگسال یا سرپرست
+      description: >-
+        ثبت‌نام عمومی فقط برای فرد بزرگسال است. حساب مدرس و مدیر از مسیر دعوت داخلی
+        ساخته می‌شود و فرد زیر ۱۸ سال از این مسیر حساب مستقل نمی‌گیرد.
+      operationId: requestAccount
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '202':
+          description: درخواست بدون افشای وجود یا نبود حساب پذیرفته شد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /v1/auth/sessions:
+    post:
+      tags: [Auth]
+      summary: آغاز نشست از طریق رابط هویت مصوب آینده
+      description: نوع اثبات هویت و ارائه‌دهنده در فاز ۳B تعیین می‌شود؛ پاسخ نباید امکان شمارش حساب‌ها را بدهد.
+      operationId: startSession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionRequest'
+      responses:
+        '204':
+          description: نشست امن در صورت موفقیت از طریق کوکی فقط HTTP برقرار شد.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+    delete:
+      tags: [Auth]
+      summary: پایان نشست جاری
+      operationId: endSession
+      responses:
+        '204':
+          description: نشست جاری خاتمه یافت.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/me:
+    get:
+      tags: [Account]
+      summary: مشاهده حساب و نقش‌های مؤثر کاربر جاری
+      operationId: getCurrentAccount
+      responses:
+        '200':
+          description: اطلاعات حداقلی حساب جاری
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/guardian/learner-profiles:
+    post:
+      tags: [Guardian]
+      summary: درخواست ایجاد پرونده حداقلی دانش‌آموز زیر ۱۸ سال
+      description: فقط نقش سرپرست؛ ایجاد پرونده به معنی تأیید پیوند یا فعال‌شدن دسترسی نیست.
+      operationId: requestMinorLearnerProfile
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinorLearnerRequest'
+      responses:
+        '202':
+          description: درخواست برای بررسی سرپرستی و رضایت ثبت شد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardianLinkPending'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v1/guardian/links/{linkId}:
+    get:
+      tags: [Guardian]
+      summary: مشاهده وضعیت پیوند سرپرستی متعلق به حساب جاری
+      operationId: getGuardianLink
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      responses:
+        '200':
+          description: وضعیت پیوند بدون نمایش مدرک یا داده غیرضروری
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardianLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v1/guardian/learners/{learnerId}/progress-summary:
+    get:
+      tags: [Guardian]
+      summary: مشاهده گزارش قابل‌فهم فرزند دارای پیوند فعال
+      description: زمان بی‌حرکت یا صرفاً بازبودن صفحه در activeMinutes محاسبه نمی‌شود.
+      operationId: getGuardianProgressSummary
+      parameters:
+        - $ref: '#/components/parameters/LearnerId'
+      responses:
+        '200':
+          description: گزارش آموزشی حداقلی در محدوده رضایت فعال
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v1/instructor/classes/{classId}/learners:
+    get:
+      tags: [Instructor]
+      summary: فهرست حداقلی یادگیرندگان کلاس تخصیص‌یافته
+      operationId: listAssignedClassLearners
+      parameters:
+        - $ref: '#/components/parameters/ClassId'
+      responses:
+        '200':
+          description: فقط داده لازم برای وظیفه آموزشی مدرس
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearnerListItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v1/admin/role-assignments:
+    post:
+      tags: [Administration]
+      summary: ثبت یا تغییر نقش با مجوز ریزدانه
+      description: عملیات نیازمند تأیید مجدد هویت، دلیل و ثبت حسابرسی است.
+      operationId: assignRole
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleAssignmentRequest'
+      responses:
+        '201':
+          description: نقش ثبت و نشست‌های اثرپذیر برای ارزیابی مجدد علامت‌گذاری شدند.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  # کوکی نشست فقط یک قرارداد است؛ روش صدور و نگهداری در ۳B مشخص می‌شود.
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-academy_session
+
+  parameters:
+    CsrfToken:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      description: توکن ضد جعل درخواست برای عملیات تغییردهنده.
+      schema:
+        type: string
+        minLength: 20
+        maxLength: 512
+    LinkId:
+      name: linkId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+    LearnerId:
+      name: learnerId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+    ClassId:
+      name: classId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+
+  responses:
+    BadRequest:
+      description: ورودی نامعتبر است؛ پاسخ شامل داده حساس نیست.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: نشست معتبر وجود ندارد یا تأیید هویت ناموفق است.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: نقش، مالکیت، پیوند یا تخصیص لازم وجود ندارد.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: منبع در محدوده مجاز کاربر پیدا نشد.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    RateLimited:
+      description: برای کاهش سوءاستفاده، درخواست باید بعداً تکرار شود.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+
+  schemas:
+    Identifier:
+      type: string
+      minLength: 16
+      maxLength: 64
+      pattern: '^[A-Za-z0-9_-]+$'
+
+    Role:
+      type: string
+      enum: [ADULT_STUDENT, GUARDIAN, INSTRUCTOR, ADMIN]
+
+    AccountRequest:
+      type: object
+      additionalProperties: false
+      required: [accountType, identifier, adultConfirmed, privacyNoticeVersion]
+      properties:
+        accountType:
+          type: string
+          enum: [ADULT_STUDENT, GUARDIAN]
+        identifier:
+          type: string
+          minLength: 5
+          maxLength: 254
+          description: راه ارتباطی بزرگسال؛ نوع و تأیید آن در ۳B تعیین می‌شود.
+        adultConfirmed:
+          type: boolean
+          const: true
+        privacyNoticeVersion:
+          type: string
+          minLength: 1
+          maxLength: 40
+
+    SessionRequest:
+      type: object
+      additionalProperties: false
+      required: [identifier, authenticator]
+      properties:
+        identifier:
+          type: string
+          minLength: 5
+          maxLength: 254
+        authenticator:
+          type: string
+          minLength: 1
+          maxLength: 2048
+          writeOnly: true
+          description: اثبات موقت هویت؛ نباید در لاگ یا جدول‌های دامنه ذخیره شود.
+
+    CurrentAccount:
+      type: object
+      additionalProperties: false
+      required: [id, status, roles]
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
+        roles:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Role'
+
+    MinorLearnerRequest:
+      type: object
+      additionalProperties: false
+      required: [preferredName, ageBand, relationship, consent]
+      properties:
+        preferredName:
+          type: string
+          minLength: 1
+          maxLength: 80
+          description: نام مورد استفاده آموزشی؛ از دریافت نام رسمی غیرضروری پرهیز شود.
+        ageBand:
+          type: string
+          enum: [AGE_10_12, AGE_13_15, AGE_16_17]
+        relationship:
+          type: string
+          enum: [PARENT, LEGAL_GUARDIAN]
+        consent:
+          $ref: '#/components/schemas/ConsentInput'
+
+    ConsentInput:
+      type: object
+      additionalProperties: false
+      required: [policyVersion, purposeCode, granted]
+      properties:
+        policyVersion:
+          type: string
+          minLength: 1
+          maxLength: 40
+        purposeCode:
+          type: string
+          enum: [EDUCATION_AND_PROGRESS_REPORTING]
+        granted:
+          type: boolean
+          const: true
+
+    GuardianLinkPending:
+      type: object
+      additionalProperties: false
+      required: [requestId, status]
+      properties:
+        requestId:
+          $ref: '#/components/schemas/Identifier'
+        status:
+          type: string
+          const: PENDING_REVIEW
+
+    GuardianLink:
+      type: object
+      additionalProperties: false
+      required: [id, status, relationship]
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, REJECTED, REVOKED]
+        relationship:
+          type: string
+          enum: [PARENT, LEGAL_GUARDIAN]
+
+    ProgressSummary:
+      type: object
+      additionalProperties: false
+      required: [learnerId, loginCount, activeMinutes, studySessions, exercisesStarted, exercisesSubmitted]
+      properties:
+        learnerId:
+          $ref: '#/components/schemas/Identifier'
+        loginCount:
+          type: integer
+          minimum: 0
+        activeMinutes:
+          type: integer
+          minimum: 0
+          description: فقط زمان تعامل معتبر؛ زمان بی‌حرکت محاسبه نمی‌شود.
+        studySessions:
+          type: integer
+          minimum: 0
+        exercisesStarted:
+          type: integer
+          minimum: 0
+        exercisesSubmitted:
+          type: integer
+          minimum: 0
+        assessmentSummary:
+          type: string
+          maxLength: 1000
+        instructorGuidance:
+          type: string
+          maxLength: 2000
+
+    LearnerListItem:
+      type: object
+      additionalProperties: false
+      required: [id, displayName]
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 80
+
+    RoleAssignmentRequest:
+      type: object
+      additionalProperties: false
+      required: [accountId, role, reason]
+      properties:
+        accountId:
+          $ref: '#/components/schemas/Identifier'
+        role:
+          $ref: '#/components/schemas/Role'
+        reason:
+          type: string
+          minLength: 8
+          maxLength: 500
+
+    RequestAccepted:
+      type: object
+      additionalProperties: false
+      required: [message]
+      properties:
+        message:
+          type: string
+          const: درخواست دریافت شد؛ در صورت امکان، راهنمای مرحله بعد ارسال می‌شود.
+
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message, requestId]
+      properties:
+        code:
+          type: string
+          maxLength: 80
+        message:
+          type: string
+          maxLength: 300
+        requestId:
+          $ref: '#/components/schemas/Identifier'
+
+# همه مسیرها به‌جز مواردی که security خالی دارند، نشست معتبر می‌خواهند.
+security:
+  - sessionCookie: []

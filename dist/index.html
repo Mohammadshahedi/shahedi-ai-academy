@@ -94,8 +94,10 @@
     }
     .button:hover { transform: translateY(-2px); }
     .button:focus-visible, .nav-link:focus-visible, .path-button:focus-visible {
+      /* حلقه دو‌رنگ، فوکوس را هم روی زمینه روشن و هم روی سرمه‌ای قابل تشخیص نگه می‌دارد. */
       outline: 3px solid var(--gold-300);
-      outline-offset: 4px;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 6px var(--navy-800);
     }
     .button--gold { background: var(--gold-500); color: var(--navy-950); box-shadow: 0 12px 35px rgba(203, 165, 92, 0.28); }
     .button--ghost { border-color: rgba(255, 255, 255, 0.25); color: var(--white); background: rgba(255, 255, 255, 0.05); }
@@ -300,8 +302,8 @@
       .course-card:last-child { grid-column: span 2; min-height: 210px; }
       .hero-grid { gap: 30px; }
     }
-    @media (max-width: 960px) {
-      .section { padding: 78px 0; }
+    /* لینک جدید پیش‌نمایش حساب‌ها باعث می‌شود منوی جمع‌شونده در تبلت زودتر فعال شود. */
+    @media (max-width: 1120px) {
       .nav-links {
         position: absolute;
         top: calc(100% + 1px);
@@ -318,6 +320,9 @@
       .nav-links.is-open { display: flex; }
       .menu-button { display: inline-flex; }
       .header-cta { display: none; }
+    }
+    @media (max-width: 960px) {
+      .section { padding: 78px 0; }
       .hero { min-height: auto; padding-top: 140px; }
       .hero-grid, .section-head, .measure-grid, .path-panel, .cta-box { grid-template-columns: 1fr; }
       .learning-map { min-height: 390px; margin-top: 24px; }
@@ -368,6 +373,7 @@
         <a class="nav-link" href="/courses/">دوره‌ها</a>
         <a class="nav-link" href="/about/">درباره آکادمی</a>
         <a class="nav-link" href="/services/">خدمات سازمانی</a>
+        <a class="nav-link" href="/account/">پیش‌نمایش حساب‌ها</a>
         <a class="nav-link" href="/contact/">تماس و مشاوره</a>
       </nav>
       <a class="button button--gold header-cta" href="/contact/">مشاوره پیش از ثبت‌نام</a>
@@ -527,7 +533,7 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div><strong>آکادمی شاهدی</strong><p class="footer-note">هوش مصنوعی را بساز، نه فقط استفاده کن</p></div>
-      <div class="footer-links"><a href="/courses/">دوره‌ها</a><a href="/services/">خدمات</a><a href="/about/">درباره ما</a><a href="/contact/">تماس</a><a href="/privacy/">حریم خصوصی</a><a href="https://t.me/shahediai" target="_blank" rel="noopener"><bdi dir="ltr">@shahediai</bdi></a><span>© <span id="year"></span></span></div>
+      <div class="footer-links"><a href="/courses/">دوره‌ها</a><a href="/services/">خدمات</a><a href="/about/">درباره ما</a><a href="/contact/">تماس</a><a href="/account/">پیش‌نمایش حساب‌ها</a><a href="/privacy/">حریم خصوصی</a><a href="https://t.me/shahediai" target="_blank" rel="noopener"><bdi dir="ltr">@shahediai</bdi></a><span>© <span id="year"></span></span></div>
     </div>
   </footer>
 
