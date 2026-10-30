@@ -1,0 +1,2269 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "5752c701-4b7f-4611-8b7b-92097791767c",
+  "prevId": "67579be6-5da0-47f5-999e-df1fe974bf98",
+  "tables": {
+    "account_identities": {
+      "name": "account_identities",
+      "columns": {
+        "identity_id": {
+          "name": "identity_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "auth_source": {
+          "name": "auth_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "external_subject": {
+          "name": "external_subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "verified_at": {
+          "name": "verified_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "account_identities_source_subject_unique": {
+          "name": "account_identities_source_subject_unique",
+          "columns": [
+            "auth_source",
+            "external_subject"
+          ],
+          "isUnique": true
+        },
+        "account_identities_account_idx": {
+          "name": "account_identities_account_idx",
+          "columns": [
+            "account_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "account_identities_account_id_accounts_account_id_fk": {
+          "name": "account_identities_account_id_accounts_account_id_fk",
+          "tableFrom": "account_identities",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "account_lifecycle_requests": {
+      "name": "account_lifecycle_requests",
+      "columns": {
+        "lifecycle_request_id": {
+          "name": "lifecycle_request_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_type": {
+          "name": "request_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_status": {
+          "name": "request_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "requested_at": {
+          "name": "requested_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cancelled_at": {
+          "name": "cancelled_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_by_account_id": {
+          "name": "completed_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "retention_policy_version": {
+          "name": "retention_policy_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "account_lifecycle_account_status_idx": {
+          "name": "account_lifecycle_account_status_idx",
+          "columns": [
+            "account_id",
+            "request_status"
+          ],
+          "isUnique": false
+        },
+        "account_lifecycle_requested_unique": {
+          "name": "account_lifecycle_requested_unique",
+          "columns": [
+            "account_id",
+            "request_type"
+          ],
+          "isUnique": true,
+          "where": "\"account_lifecycle_requests\".\"request_status\" = 'REQUESTED'"
+        }
+      },
+      "foreignKeys": {
+        "account_lifecycle_requests_account_id_accounts_account_id_fk": {
+          "name": "account_lifecycle_requests_account_id_accounts_account_id_fk",
+          "tableFrom": "account_lifecycle_requests",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "account_lifecycle_requests_completed_by_account_id_accounts_account_id_fk": {
+          "name": "account_lifecycle_requests_completed_by_account_id_accounts_account_id_fk",
+          "tableFrom": "account_lifecycle_requests",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "completed_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "accounts": {
+      "name": "accounts",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_status": {
+          "name": "account_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_category": {
+          "name": "account_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "adult_confirmed": {
+          "name": "adult_confirmed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "privacy_notice_version": {
+          "name": "privacy_notice_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "closed_at": {
+          "name": "closed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "accounts_adult_self_service_check": {
+          "name": "accounts_adult_self_service_check",
+          "value": "\"accounts\".\"account_category\" <> 'ADULT_SELF_SERVICE' OR \"accounts\".\"adult_confirmed\" = 1"
+        }
+      }
+    },
+    "admin_bootstrap_state": {
+      "name": "admin_bootstrap_state",
+      "columns": {
+        "bootstrap_id": {
+          "name": "bootstrap_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "used_by_account_id": {
+          "name": "used_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "used_at": {
+          "name": "used_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "admin_bootstrap_state_used_by_account_id_accounts_account_id_fk": {
+          "name": "admin_bootstrap_state_used_by_account_id_accounts_account_id_fk",
+          "tableFrom": "admin_bootstrap_state",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "used_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "audit_events": {
+      "name": "audit_events",
+      "columns": {
+        "audit_event_id": {
+          "name": "audit_event_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "actor_account_id": {
+          "name": "actor_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "action_code": {
+          "name": "action_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "target_type": {
+          "name": "target_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "target_id": {
+          "name": "target_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "outcome_code": {
+          "name": "outcome_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason_code": {
+          "name": "reason_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "audit_events_target_time_idx": {
+          "name": "audit_events_target_time_idx",
+          "columns": [
+            "target_type",
+            "target_id",
+            "occurred_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "audit_events_actor_account_id_accounts_account_id_fk": {
+          "name": "audit_events_actor_account_id_accounts_account_id_fk",
+          "tableFrom": "audit_events",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "actor_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "consent_records": {
+      "name": "consent_records",
+      "columns": {
+        "consent_id": {
+          "name": "consent_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "guardian_link_id": {
+          "name": "guardian_link_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "policy_version": {
+          "name": "policy_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "purpose_code": {
+          "name": "purpose_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "granted_at": {
+          "name": "granted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "withdrawn_at": {
+          "name": "withdrawn_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "consent_records_active_link_idx": {
+          "name": "consent_records_active_link_idx",
+          "columns": [
+            "guardian_link_id",
+            "withdrawn_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "consent_records_guardian_link_id_guardian_learner_links_guardian_link_id_fk": {
+          "name": "consent_records_guardian_link_id_guardian_learner_links_guardian_link_id_fk",
+          "tableFrom": "consent_records",
+          "tableTo": "guardian_learner_links",
+          "columnsFrom": [
+            "guardian_link_id"
+          ],
+          "columnsTo": [
+            "guardian_link_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "guardian_learner_links": {
+      "name": "guardian_learner_links",
+      "columns": {
+        "guardian_link_id": {
+          "name": "guardian_link_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "guardian_account_id": {
+          "name": "guardian_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "learner_profile_id": {
+          "name": "learner_profile_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "relationship_code": {
+          "name": "relationship_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "link_status": {
+          "name": "link_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reviewed_by_account_id": {
+          "name": "reviewed_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "requested_at": {
+          "name": "requested_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reviewed_at": {
+          "name": "reviewed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "guardian_links_guardian_learner_unique": {
+          "name": "guardian_links_guardian_learner_unique",
+          "columns": [
+            "guardian_account_id",
+            "learner_profile_id"
+          ],
+          "isUnique": true
+        },
+        "guardian_links_active_guardian_idx": {
+          "name": "guardian_links_active_guardian_idx",
+          "columns": [
+            "guardian_account_id",
+            "link_status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "guardian_learner_links_guardian_account_id_accounts_account_id_fk": {
+          "name": "guardian_learner_links_guardian_account_id_accounts_account_id_fk",
+          "tableFrom": "guardian_learner_links",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "guardian_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "guardian_learner_links_learner_profile_id_minor_learner_profiles_learner_profile_id_fk": {
+          "name": "guardian_learner_links_learner_profile_id_minor_learner_profiles_learner_profile_id_fk",
+          "tableFrom": "guardian_learner_links",
+          "tableTo": "minor_learner_profiles",
+          "columnsFrom": [
+            "learner_profile_id"
+          ],
+          "columnsTo": [
+            "learner_profile_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "guardian_learner_links_reviewed_by_account_id_accounts_account_id_fk": {
+          "name": "guardian_learner_links_reviewed_by_account_id_accounts_account_id_fk",
+          "tableFrom": "guardian_learner_links",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "reviewed_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lms_class_instructor_assignments": {
+      "name": "lms_class_instructor_assignments",
+      "columns": {
+        "assignment_id": {
+          "name": "assignment_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "class_id": {
+          "name": "class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "instructor_account_id": {
+          "name": "instructor_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_by_account_id": {
+          "name": "assigned_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_at": {
+          "name": "assigned_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_class_instructor_active_unique": {
+          "name": "lms_class_instructor_active_unique",
+          "columns": [
+            "class_id",
+            "instructor_account_id"
+          ],
+          "isUnique": true,
+          "where": "\"lms_class_instructor_assignments\".\"revoked_at\" IS NULL"
+        },
+        "lms_class_instructor_account_idx": {
+          "name": "lms_class_instructor_account_idx",
+          "columns": [
+            "instructor_account_id",
+            "revoked_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_class_instructor_assignments_class_id_lms_classes_class_id_fk": {
+          "name": "lms_class_instructor_assignments_class_id_lms_classes_class_id_fk",
+          "tableFrom": "lms_class_instructor_assignments",
+          "tableTo": "lms_classes",
+          "columnsFrom": [
+            "class_id"
+          ],
+          "columnsTo": [
+            "class_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_class_instructor_assignments_instructor_account_id_accounts_account_id_fk": {
+          "name": "lms_class_instructor_assignments_instructor_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_class_instructor_assignments",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "instructor_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_class_instructor_assignments_assigned_by_account_id_accounts_account_id_fk": {
+          "name": "lms_class_instructor_assignments_assigned_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_class_instructor_assignments",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "assigned_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lms_classes": {
+      "name": "lms_classes",
+      "columns": {
+        "class_id": {
+          "name": "class_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "class_status": {
+          "name": "class_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "activated_at": {
+          "name": "activated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "closed_at": {
+          "name": "closed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by_account_id": {
+          "name": "created_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_classes_course_status_idx": {
+          "name": "lms_classes_course_status_idx",
+          "columns": [
+            "course_id",
+            "class_status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_classes_course_id_lms_courses_course_id_fk": {
+          "name": "lms_classes_course_id_lms_courses_course_id_fk",
+          "tableFrom": "lms_classes",
+          "tableTo": "lms_courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "course_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_classes_created_by_account_id_accounts_account_id_fk": {
+          "name": "lms_classes_created_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_classes",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "created_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lms_classes_status_check": {
+          "name": "lms_classes_status_check",
+          "value": "\"lms_classes\".\"class_status\" IN ('DRAFT', 'ACTIVE', 'CLOSED')"
+        }
+      }
+    },
+    "lms_courses": {
+      "name": "lms_courses",
+      "columns": {
+        "course_id": {
+          "name": "course_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "audience": {
+          "name": "audience",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "course_status": {
+          "name": "course_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "activated_at": {
+          "name": "activated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by_account_id": {
+          "name": "created_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_courses_status_idx": {
+          "name": "lms_courses_status_idx",
+          "columns": [
+            "course_status",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_courses_created_by_account_id_accounts_account_id_fk": {
+          "name": "lms_courses_created_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_courses",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "created_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lms_courses_adult_only_check": {
+          "name": "lms_courses_adult_only_check",
+          "value": "\"lms_courses\".\"audience\" = 'ADULT_ONLY'"
+        },
+        "lms_courses_status_check": {
+          "name": "lms_courses_status_check",
+          "value": "\"lms_courses\".\"course_status\" IN ('DRAFT', 'ACTIVE', 'ARCHIVED')"
+        }
+      }
+    },
+    "lms_enrollments": {
+      "name": "lms_enrollments",
+      "columns": {
+        "enrollment_id": {
+          "name": "enrollment_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "class_id": {
+          "name": "class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "student_account_id": {
+          "name": "student_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "enrollment_status": {
+          "name": "enrollment_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "withdrawn_at": {
+          "name": "withdrawn_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by_account_id": {
+          "name": "created_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_enrollments_class_student_unique": {
+          "name": "lms_enrollments_class_student_unique",
+          "columns": [
+            "class_id",
+            "student_account_id"
+          ],
+          "isUnique": true
+        },
+        "lms_enrollments_student_status_idx": {
+          "name": "lms_enrollments_student_status_idx",
+          "columns": [
+            "student_account_id",
+            "enrollment_status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_enrollments_class_id_lms_classes_class_id_fk": {
+          "name": "lms_enrollments_class_id_lms_classes_class_id_fk",
+          "tableFrom": "lms_enrollments",
+          "tableTo": "lms_classes",
+          "columnsFrom": [
+            "class_id"
+          ],
+          "columnsTo": [
+            "class_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_enrollments_student_account_id_accounts_account_id_fk": {
+          "name": "lms_enrollments_student_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_enrollments",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "student_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_enrollments_created_by_account_id_accounts_account_id_fk": {
+          "name": "lms_enrollments_created_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_enrollments",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "created_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lms_enrollments_status_check": {
+          "name": "lms_enrollments_status_check",
+          "value": "\"lms_enrollments\".\"enrollment_status\" IN ('ACTIVE', 'COMPLETED', 'WITHDRAWN')"
+        }
+      }
+    },
+    "lms_lesson_publications": {
+      "name": "lms_lesson_publications",
+      "columns": {
+        "publication_id": {
+          "name": "publication_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lesson_id": {
+          "name": "lesson_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revision_id": {
+          "name": "revision_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lesson_version": {
+          "name": "lesson_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason_code": {
+          "name": "reason_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "published_by_account_id": {
+          "name": "published_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_lesson_publications_lesson_version_unique": {
+          "name": "lms_lesson_publications_lesson_version_unique",
+          "columns": [
+            "lesson_id",
+            "lesson_version"
+          ],
+          "isUnique": true
+        },
+        "lms_lesson_publications_lesson_time_idx": {
+          "name": "lms_lesson_publications_lesson_time_idx",
+          "columns": [
+            "lesson_id",
+            "published_at",
+            "publication_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_lesson_publications_lesson_id_lms_lessons_lesson_id_fk": {
+          "name": "lms_lesson_publications_lesson_id_lms_lessons_lesson_id_fk",
+          "tableFrom": "lms_lesson_publications",
+          "tableTo": "lms_lessons",
+          "columnsFrom": [
+            "lesson_id"
+          ],
+          "columnsTo": [
+            "lesson_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_lesson_publications_revision_id_lms_lesson_revisions_revision_id_fk": {
+          "name": "lms_lesson_publications_revision_id_lms_lesson_revisions_revision_id_fk",
+          "tableFrom": "lms_lesson_publications",
+          "tableTo": "lms_lesson_revisions",
+          "columnsFrom": [
+            "revision_id"
+          ],
+          "columnsTo": [
+            "revision_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_lesson_publications_published_by_account_id_accounts_account_id_fk": {
+          "name": "lms_lesson_publications_published_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_lesson_publications",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "published_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lms_lesson_revisions": {
+      "name": "lms_lesson_revisions",
+      "columns": {
+        "revision_id": {
+          "name": "revision_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lesson_id": {
+          "name": "lesson_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "body_text": {
+          "name": "body_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by_account_id": {
+          "name": "created_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_lesson_revisions_lesson_time_idx": {
+          "name": "lms_lesson_revisions_lesson_time_idx",
+          "columns": [
+            "lesson_id",
+            "created_at",
+            "revision_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_lesson_revisions_lesson_id_lms_lessons_lesson_id_fk": {
+          "name": "lms_lesson_revisions_lesson_id_lms_lessons_lesson_id_fk",
+          "tableFrom": "lms_lesson_revisions",
+          "tableTo": "lms_lessons",
+          "columnsFrom": [
+            "lesson_id"
+          ],
+          "columnsTo": [
+            "lesson_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_lesson_revisions_created_by_account_id_accounts_account_id_fk": {
+          "name": "lms_lesson_revisions_created_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_lesson_revisions",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "created_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lms_lessons": {
+      "name": "lms_lessons",
+      "columns": {
+        "lesson_id": {
+          "name": "lesson_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "body_text": {
+          "name": "body_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lesson_status": {
+          "name": "lesson_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "published_revision_id": {
+          "name": "published_revision_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by_account_id": {
+          "name": "created_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_lessons_course_position_unique": {
+          "name": "lms_lessons_course_position_unique",
+          "columns": [
+            "course_id",
+            "position"
+          ],
+          "isUnique": true
+        },
+        "lms_lessons_course_status_idx": {
+          "name": "lms_lessons_course_status_idx",
+          "columns": [
+            "course_id",
+            "lesson_status",
+            "position"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_lessons_course_id_lms_courses_course_id_fk": {
+          "name": "lms_lessons_course_id_lms_courses_course_id_fk",
+          "tableFrom": "lms_lessons",
+          "tableTo": "lms_courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "course_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lms_lessons_created_by_account_id_accounts_account_id_fk": {
+          "name": "lms_lessons_created_by_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_lessons",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "created_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lms_lessons_position_check": {
+          "name": "lms_lessons_position_check",
+          "value": "\"lms_lessons\".\"position\" >= 1"
+        },
+        "lms_lessons_status_check": {
+          "name": "lms_lessons_status_check",
+          "value": "\"lms_lessons\".\"lesson_status\" IN ('DRAFT', 'PUBLISHED', 'ARCHIVED')"
+        }
+      }
+    },
+    "lms_lifecycle_events": {
+      "name": "lms_lifecycle_events",
+      "columns": {
+        "lifecycle_event_id": {
+          "name": "lifecycle_event_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "resource_type": {
+          "name": "resource_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "resource_id": {
+          "name": "resource_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "from_status": {
+          "name": "from_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "to_status": {
+          "name": "to_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason_code": {
+          "name": "reason_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "resource_version": {
+          "name": "resource_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "actor_account_id": {
+          "name": "actor_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lms_lifecycle_events_resource_version_unique": {
+          "name": "lms_lifecycle_events_resource_version_unique",
+          "columns": [
+            "resource_type",
+            "resource_id",
+            "resource_version"
+          ],
+          "isUnique": true
+        },
+        "lms_lifecycle_events_resource_time_idx": {
+          "name": "lms_lifecycle_events_resource_time_idx",
+          "columns": [
+            "resource_type",
+            "resource_id",
+            "occurred_at"
+          ],
+          "isUnique": false
+        },
+        "lms_lifecycle_events_time_idx": {
+          "name": "lms_lifecycle_events_time_idx",
+          "columns": [
+            "occurred_at",
+            "lifecycle_event_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lms_lifecycle_events_actor_account_id_accounts_account_id_fk": {
+          "name": "lms_lifecycle_events_actor_account_id_accounts_account_id_fk",
+          "tableFrom": "lms_lifecycle_events",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "actor_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lms_lifecycle_events_resource_type_check": {
+          "name": "lms_lifecycle_events_resource_type_check",
+          "value": "\"lms_lifecycle_events\".\"resource_type\" IN ('COURSE', 'CLASS', 'LESSON', 'ENROLLMENT', 'INSTRUCTOR_ASSIGNMENT')"
+        },
+        "lms_lifecycle_events_reason_check": {
+          "name": "lms_lifecycle_events_reason_check",
+          "value": "\"lms_lifecycle_events\".\"reason_code\" IN ('RESOURCE_CREATED', 'CONTENT_READY', 'TEMPORARY_PAUSE', 'ADMIN_CORRECTION', 'PROGRAM_CLOSED', 'ENROLLMENT_COMPLETED', 'ENROLLMENT_WITHDRAWN', 'RE_ENROLLMENT', 'ASSIGNED', 'INSTRUCTOR_CHANGED')"
+        },
+        "lms_lifecycle_events_version_check": {
+          "name": "lms_lifecycle_events_version_check",
+          "value": "\"lms_lifecycle_events\".\"resource_version\" >= 1"
+        }
+      }
+    },
+    "minor_learner_profiles": {
+      "name": "minor_learner_profiles",
+      "columns": {
+        "learner_profile_id": {
+          "name": "learner_profile_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "preferred_name": {
+          "name": "preferred_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "age_band": {
+          "name": "age_band",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "profile_status": {
+          "name": "profile_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "permission_grants": {
+      "name": "permission_grants",
+      "columns": {
+        "permission_grant_id": {
+          "name": "permission_grant_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "permission_code": {
+          "name": "permission_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "granted_by_account_id": {
+          "name": "granted_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "grant_reason": {
+          "name": "grant_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "granted_at": {
+          "name": "granted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "permission_grants_active_account_idx": {
+          "name": "permission_grants_active_account_idx",
+          "columns": [
+            "account_id",
+            "revoked_at"
+          ],
+          "isUnique": false
+        },
+        "permission_grants_active_unique": {
+          "name": "permission_grants_active_unique",
+          "columns": [
+            "account_id",
+            "permission_code"
+          ],
+          "isUnique": true,
+          "where": "\"permission_grants\".\"revoked_at\" IS NULL"
+        }
+      },
+      "foreignKeys": {
+        "permission_grants_account_id_accounts_account_id_fk": {
+          "name": "permission_grants_account_id_accounts_account_id_fk",
+          "tableFrom": "permission_grants",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "permission_grants_granted_by_account_id_accounts_account_id_fk": {
+          "name": "permission_grants_granted_by_account_id_accounts_account_id_fk",
+          "tableFrom": "permission_grants",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "granted_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "rate_limit_buckets": {
+      "name": "rate_limit_buckets",
+      "columns": {
+        "action_code": {
+          "name": "action_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subject_digest": {
+          "name": "subject_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "window_started_at": {
+          "name": "window_started_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_count": {
+          "name": "request_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "rate_limit_bucket_unique": {
+          "name": "rate_limit_bucket_unique",
+          "columns": [
+            "action_code",
+            "subject_digest",
+            "window_started_at"
+          ],
+          "isUnique": true
+        },
+        "rate_limit_updated_idx": {
+          "name": "rate_limit_updated_idx",
+          "columns": [
+            "updated_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "retention_policy_versions": {
+      "name": "retention_policy_versions",
+      "columns": {
+        "policy_version": {
+          "name": "policy_version",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_closure_delay_days": {
+          "name": "account_closure_delay_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "audit_retention_days": {
+          "name": "audit_retention_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "activated_by_account_id": {
+          "name": "activated_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "activated_at": {
+          "name": "activated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "retired_at": {
+          "name": "retired_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "retention_policy_versions_activated_by_account_id_accounts_account_id_fk": {
+          "name": "retention_policy_versions_activated_by_account_id_accounts_account_id_fk",
+          "tableFrom": "retention_policy_versions",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "activated_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "role_assignments": {
+      "name": "role_assignments",
+      "columns": {
+        "role_assignment_id": {
+          "name": "role_assignment_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role_code": {
+          "name": "role_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_by_account_id": {
+          "name": "assigned_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "assignment_reason": {
+          "name": "assignment_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_at": {
+          "name": "assigned_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "role_assignments_active_account_idx": {
+          "name": "role_assignments_active_account_idx",
+          "columns": [
+            "account_id",
+            "revoked_at"
+          ],
+          "isUnique": false
+        },
+        "role_assignments_active_unique": {
+          "name": "role_assignments_active_unique",
+          "columns": [
+            "account_id",
+            "role_code"
+          ],
+          "isUnique": true,
+          "where": "\"role_assignments\".\"revoked_at\" IS NULL"
+        }
+      },
+      "foreignKeys": {
+        "role_assignments_account_id_accounts_account_id_fk": {
+          "name": "role_assignments_account_id_accounts_account_id_fk",
+          "tableFrom": "role_assignments",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "role_assignments_assigned_by_account_id_accounts_account_id_fk": {
+          "name": "role_assignments_assigned_by_account_id_accounts_account_id_fk",
+          "tableFrom": "role_assignments",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "assigned_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "staff_invitation_acceptance_claims": {
+      "name": "staff_invitation_acceptance_claims",
+      "columns": {
+        "invitation_id": {
+          "name": "invitation_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "accepted_by_account_id": {
+          "name": "accepted_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claimed_at": {
+          "name": "claimed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "staff_invitation_acceptance_claims_invitation_id_staff_invitations_invitation_id_fk": {
+          "name": "staff_invitation_acceptance_claims_invitation_id_staff_invitations_invitation_id_fk",
+          "tableFrom": "staff_invitation_acceptance_claims",
+          "tableTo": "staff_invitations",
+          "columnsFrom": [
+            "invitation_id"
+          ],
+          "columnsTo": [
+            "invitation_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "staff_invitation_acceptance_claims_accepted_by_account_id_accounts_account_id_fk": {
+          "name": "staff_invitation_acceptance_claims_accepted_by_account_id_accounts_account_id_fk",
+          "tableFrom": "staff_invitation_acceptance_claims",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "accepted_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "staff_invitation_tokens": {
+      "name": "staff_invitation_tokens",
+      "columns": {
+        "invitation_id": {
+          "name": "invitation_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token_digest": {
+          "name": "token_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email_binding_digest": {
+          "name": "email_binding_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "consumed_at": {
+          "name": "consumed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "staff_invitation_tokens_digest_unique": {
+          "name": "staff_invitation_tokens_digest_unique",
+          "columns": [
+            "token_digest"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "staff_invitation_tokens_invitation_id_staff_invitations_invitation_id_fk": {
+          "name": "staff_invitation_tokens_invitation_id_staff_invitations_invitation_id_fk",
+          "tableFrom": "staff_invitation_tokens",
+          "tableTo": "staff_invitations",
+          "columnsFrom": [
+            "invitation_id"
+          ],
+          "columnsTo": [
+            "invitation_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "staff_invitations": {
+      "name": "staff_invitations",
+      "columns": {
+        "invitation_id": {
+          "name": "invitation_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email_digest": {
+          "name": "email_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invited_role": {
+          "name": "invited_role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invited_by_account_id": {
+          "name": "invited_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invitation_status": {
+          "name": "invitation_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "accepted_at": {
+          "name": "accepted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accepted_by_account_id": {
+          "name": "accepted_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revoked_by_account_id": {
+          "name": "revoked_by_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "staff_invitations_digest_status_idx": {
+          "name": "staff_invitations_digest_status_idx",
+          "columns": [
+            "email_digest",
+            "invitation_status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "staff_invitations_invited_by_account_id_accounts_account_id_fk": {
+          "name": "staff_invitations_invited_by_account_id_accounts_account_id_fk",
+          "tableFrom": "staff_invitations",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "invited_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "staff_invitations_accepted_by_account_id_accounts_account_id_fk": {
+          "name": "staff_invitations_accepted_by_account_id_accounts_account_id_fk",
+          "tableFrom": "staff_invitations",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "accepted_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "staff_invitations_revoked_by_account_id_accounts_account_id_fk": {
+          "name": "staff_invitations_revoked_by_account_id_accounts_account_id_fk",
+          "tableFrom": "staff_invitations",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "revoked_by_account_id"
+          ],
+          "columnsTo": [
+            "account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

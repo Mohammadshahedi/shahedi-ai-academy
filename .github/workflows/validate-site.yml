@@ -1,5 +1,5 @@
-# کنترل خودکار نسخه استاتیک در Pull Request و Push شاخه اصلی
-name: Validate static site
+# کنترل خودکار سایت Worker و قراردادهای حریم خصوصی در Pull Request و Push شاخه اصلی
+name: Validate academy site
 
 on:
   push:
@@ -18,22 +18,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # نسخه پایدار Node برای اجرای اسکریپت‌های بدون وابستگی پروژه کافی است.
+      # نسخه پایدار Node برای Vinext، TypeScript و validatorها استفاده می‌شود.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Validate site structure
-        run: node scripts/validate-site.mjs
+      # نصب قفل‌شده، از تغییر ناخواسته وابستگی‌ها در CI جلوگیری می‌کند.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate site structure and phases
+        run: npm run check
 
       # مرزهای پیش‌نمایش فاز ۳A، RBAC و رضایت والدین مستقل کنترل می‌شوند.
       - name: Validate phase 3A safety contracts
         run: node scripts/validate-phase3.mjs
 
-      - name: Check shared JavaScript syntax
-        run: node --check dist/assets/site.js
-
-      # خود اعتبارسنج فاز ۳ نیز باید از نظر نحو JavaScript سالم بماند.
-      - name: Check phase 3 validator syntax
-        run: node --check scripts/validate-phase3.mjs
+      # build باید Worker و migration موردنیاز Sites را بدون انتشار تولید کند.
+      - name: Build Worker
+        run: npm run build

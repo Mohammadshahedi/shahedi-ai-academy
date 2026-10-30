@@ -6,9 +6,9 @@ import { access, readFile, readdir, stat } from "node:fs/promises";
 import { extname, join, relative, resolve } from "node:path";
 
 const projectRoot = resolve(import.meta.dirname, "..");
-const distRoot = join(projectRoot, "dist");
-const accountPagePath = join(distRoot, "account", "index.html");
-const sharedSiteScriptPath = join(distRoot, "assets", "site.js");
+const sourceRoot = join(projectRoot, "legacy-static");
+const accountPagePath = join(sourceRoot, "account", "index.html");
+const sharedSiteScriptPath = join(sourceRoot, "assets", "site.js");
 const errors = [];
 
 /* همه فایل‌های یک پوشه را بدون دنبال‌کردن مسیر خارج از پروژه فهرست می‌کند. */
@@ -54,7 +54,7 @@ for (const document of requiredDocuments) {
 }
 
 if (!await exists(accountPagePath)) {
-  errors.push("dist/account/index.html: صفحه پیش‌نمایش حساب‌ها پیدا نشد.");
+  errors.push("legacy-static/account/index.html: آرشیو پیش‌نمایش حساب‌ها پیدا نشد.");
 } else {
   const accountHtml = await readFile(accountPagePath, "utf8");
 
@@ -87,7 +87,7 @@ if (!await exists(accountPagePath)) {
 }
 
 /* اگر در آینده فایل اختصاصی حساب اضافه شد، تا پایان ۳A باید محلی و بدون ذخیره بماند. */
-const optionalAccountScript = join(distRoot, "assets", "account.js");
+const optionalAccountScript = join(sourceRoot, "assets", "account.js");
 if (await exists(optionalAccountScript)) {
   const accountScript = await readFile(optionalAccountScript, "utf8");
   if (!/^\s*\/\*/.test(accountScript)) errors.push("account.js باید با توضیح روشن دامنه رفتاری آغاز شود.");
@@ -103,20 +103,20 @@ if (await exists(sharedSiteScriptPath)) {
     errors.push("site.js در فاز ۳A نباید ارسال شبکه یا ذخیره مرورگر داشته باشد.");
   }
 } else {
-  errors.push("dist/assets/site.js: اسکریپت مشترک صفحه حساب پیدا نشد.");
+  errors.push("legacy-static/assets/site.js: اسکریپت مشترک صفحه حساب پیدا نشد.");
 }
 
 /* همه صفحاتی که ناوبری اصلی دارند باید لینک پیش‌نمایش حساب‌ها را ارائه کنند. */
-const distFiles = await walk(distRoot);
-const htmlFiles = distFiles.filter((file) => extname(file) === ".html");
+const sourceFiles = await walk(sourceRoot);
+const htmlFiles = sourceFiles.filter((file) => extname(file) === ".html");
 for (const file of htmlFiles) {
   const html = await readFile(file, "utf8");
   if (html.includes('class="nav-links"') && !html.includes('href="/account/"')) {
     errors.push(`${relative(projectRoot, file)}: لینک /account/ در ناوبری اصلی وجود ندارد.`);
   }
   /* عنوان لینک باید پیش‌نمایشی‌بودن قابلیت را پیش از ورود به صفحه نیز روشن کند. */
-  if (html.includes('class="nav-links"') && !html.includes('>پیش‌نمایش حساب‌ها</a>')) {
-    errors.push(`${relative(projectRoot, file)}: عنوان لینک حساب‌ها ممکن است فعال‌بودن ثبت‌نام را القا کند.`);
+  if (html.includes('class="nav-links"') && !html.includes('>پیش‌نمایش حساب‌ها</a>') && !html.includes('>حساب کاربری</a>')) {
+    errors.push(`${relative(projectRoot, file)}: عنوان لینک حساب‌ها روشن و قابل‌فهم نیست.`);
   }
 }
 

@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791876606912,
+      "tag": "0000_puzzling_calypso",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793182179763,
+      "tag": "0001_old_phil_sheldon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793306901233,
+      "tag": "0002_daily_banshee",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1793311032026,
+      "tag": "0003_friendly_lady_bullseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793311753977,
+      "tag": "0004_typical_rick_jones",
+      "breakpoints": true
+    }
+  ]
+}

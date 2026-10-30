@@ -1,12 +1,12 @@
 /**
- * اعتبارسنجی مستقل نسخه استاتیک آکادمی شاهدی.
+ * اعتبارسنجی مستقل صفحات معرفی تثبیت‌شده آکادمی شاهدی.
  * اسکریپت فقط فایل‌ها را می‌خواند و هیچ تغییری ایجاد نمی‌کند.
  */
 import { readFile, readdir, stat } from "node:fs/promises";
 import { extname, join, normalize, relative, resolve } from "node:path";
 
 const projectRoot = resolve(import.meta.dirname, "..");
-const distRoot = join(projectRoot, "dist");
+const sourceRoot = join(projectRoot, "legacy-static");
 const errors = [];
 
 /* همه فایل‌های پوشه انتشار را به‌صورت بازگشتی فهرست می‌کند. */
@@ -22,15 +22,15 @@ async function walk(directory) {
   return files;
 }
 
-/* مسیرهای وب ریشه‌ای را به فایل متناظر در dist تبدیل می‌کند. */
+/* مسیرهای وب ریشه‌ای را به فایل متناظر در منبع صفحات معرفی تبدیل می‌کند. */
 function routeToFile(route) {
   const cleanRoute = route.split(/[?#]/, 1)[0];
-  if (cleanRoute === "/") return join(distRoot, "index.html");
-  const candidate = join(distRoot, cleanRoute.replace(/^\//, ""));
+  if (cleanRoute === "/") return join(sourceRoot, "index.html");
+  const candidate = join(sourceRoot, cleanRoute.replace(/^\//, ""));
   return extname(candidate) ? candidate : join(candidate, "index.html");
 }
 
-const files = await walk(distRoot);
+const files = await walk(sourceRoot);
 const htmlFiles = files.filter((file) => extname(file) === ".html");
 const seenTitles = new Map();
 
@@ -71,7 +71,7 @@ if (!allText.includes(certificateText)) errors.push("عبارت مصوب گوا�
 if (/مشاوره و ثبت‌نام/.test(allText)) errors.push("CTA غیرواقعی «مشاوره و ثبت‌نام» هنوز وجود دارد.");
 
 /* JavaScript نسخه فعلی نباید اطلاعات ابزار مشاوره را ارسال یا ذخیره کند. */
-const siteScript = await readFile(join(distRoot, "assets", "site.js"), "utf8");
+const siteScript = await readFile(join(sourceRoot, "assets", "site.js"), "utf8");
 if (/\b(?:fetch|XMLHttpRequest|localStorage|sessionStorage)\b/.test(siteScript)) errors.push("site.js شامل ارسال شبکه یا ذخیره محلی بررسی‌نشده است.");
 
 if (errors.length) {
